@@ -1,3 +1,5 @@
+/* eslint-env node, mocha */
+const { assert } = require('chai')
 
 function * funcGenerator(dbConfig, query) {
   const db = initDb(dbConfig)
