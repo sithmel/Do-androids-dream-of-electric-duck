@@ -26,6 +26,7 @@ function oneTwoCustom () {
       }
       numberOfCalls++
       if (numberOfCalls > 2) {
+        started = false
         return { done: true }
       }
       return { value: numberOfCalls, done: false }

@@ -3,10 +3,10 @@ const { assert } = require('chai')
 
 function arrayFrom (iterable) {
   const array = []
-  const iterator = iterable()[Symbol.iterator]()
+  const iterator = iterable[Symbol.iterator]()
   try {
     while (true) {
-      const { value, done } = iterator
+      const { value, done } = iterator.next()
       if (done) break
       array.push(value)
     }
@@ -28,7 +28,7 @@ function * oneTwo () {
   }
 }
 
-describe.skip('consume iterable semantic', () => {
+describe('consume iterable semantic', () => {
   beforeEach(() => {
     started = false
   })
@@ -40,7 +40,7 @@ describe.skip('consume iterable semantic', () => {
 
   it('Array.from calls return', () => {
     assert.isFalse(started)
-    arrayFrom(oneTwo)
+    arrayFrom(oneTwo())
     assert.isFalse(started)
   })
 })
