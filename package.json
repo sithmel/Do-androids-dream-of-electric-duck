@@ -7,7 +7,7 @@
   "scripts": {
     "test": "mocha",
     "start": "reveal-md README.md",
-    "build": "reveal-md README.md --static docs"
+    "build": "reveal-md README.md --static docs && cp -r imgs docs/imgs"
   },
   "keywords": [],
   "repository": "git@github.com:sithmel/do-androids-dream-of-electric-duck.git",

@@ -1,95 +1,144 @@
 /* eslint-env node, mocha */
 const { assert } = require('chai')
 
-function * funcGenerator(dbConfig, query) {
-  const db = initDb(dbConfig)
+let started = false
+
+function * oneTwoFuncGen () {
+  started = true
   try {
-    const reader = db(query)
-    while (true) {
-      const data = reader.get()
-      if (data === undefined) {
-        return
-      }
-      yield data
-    }
+    yield 1
+    yield 2
   } finally {
-    db.close()
+    started = false
   }
 }
 
-class funcGenerator2 {
-  constructor(dbConfig, query) {
-    this.dbConfig = dbConfig
-    this.query = query
-    this.initiated = false
-  }
+function oneTwoCustom () {
+  let numberOfCalls = 0
 
-  [Symbol.iterator] () {
-    return this
-  }
-
-  next () {
-    let db, reader
-    if (!this.initiated) {
-      db = initDb(this.dbConfig)
-      reader = db(this.query)
-    }
-    const data = reader.get()
-    if (data === undefined) {
-      return { done: true }
-    }
-    return { value: data, done: false }
-  }
-
-  return () {
-    if (this.initiated) {
-      this.db.close()
-    }
-  }
-}
-
-function funcGenerator3 (dbConfig, query) {
-  let initiated = false
-  let db, reader
   const obj = {
     [Symbol.iterator] () {
       return obj
     },
     next () {
-      if (!initiated) {
-        db = initDb(dbConfig)
-        reader = db(query)
+      if (!numberOfCalls) {
+        started = true
       }
-      const data = reader.get()
-      if (data === undefined) {
+      numberOfCalls++
+      if (numberOfCalls > 2) {
         return { done: true }
       }
-      return { value: data, done: false }
+      return { value: numberOfCalls, done: false }
     },
     return () {
-      if (initiated) {
-        db.close()
-      }
+      started = false
+      return { done: true }
     }
   }
   return obj
 }
 
-function consume(func) {
-  for (const item of funcGenerator('gen', 'query')) {
-    func(item)
-  }
-}
+for (const oneTwo of [oneTwoFuncGen, oneTwoCustom]) {
+  describe('function generator', () => {
+    it('generator function is a function', () => {
+      assert.typeOf(oneTwo, 'function')
+    })
 
-function consume2(func) {
-  const iterator = funcGenerator('gen', 'query')[Symbol.iterator]()
-  try {
-    while (true) {
-      const { value, done } = iterator
-      if (done) break
-      func(value)
-    }
-  } finally {
-    if (iterator.return) iterator.return()
-  }
+    it('generator object is iterable', () => {
+      const genObj = oneTwo()
+      assert.isTrue(Symbol.iterator in genObj)
+    })
+
+    it('generator object is an iterator', () => {
+      const genObj = oneTwo()
+      assert.isTrue('next' in genObj)
+    })
+
+    it('generator object iterable returns itself', () => {
+      const genObj = oneTwo()
+      assert.equal(genObj, genObj[Symbol.iterator]())
+    })
+  })
+
+  describe('function generator return semantic', () => {
+    beforeEach(() => {
+      started = false
+    })
+
+    it('returns a sequence', () => {
+      assert.deepEqual(Array.from(oneTwo()), [1, 2])
+    })
+
+    it('only starts when we start consuming it', () => {
+      assert.isFalse(started)
+      const iterator = oneTwo()[Symbol.iterator]()
+      assert.isFalse(started)
+      const { value } = iterator.next()
+      assert.isTrue(started)
+      assert.equal(value, 1)
+    })
+
+    it('Array.from calls return', () => {
+      assert.isFalse(started)
+      Array.from(oneTwo())
+      assert.isFalse(started)
+    })
+
+    it('for..of calls return', () => {
+      assert.isFalse(started)
+      for (const item of oneTwo()) {
+        assert.equal(item, 1)
+        break
+      }
+      assert.isFalse(started)
+    })
+
+    it('spread operator calls return', () => {
+      assert.isFalse(started)
+      const [ a ] = oneTwo()
+      assert.equal(a, 1)
+      assert.isFalse(started)
+    })
+  })
+
+  describe('for semantic', () => {
+    beforeEach(() => {
+      started = false
+    })
+
+    it('returns a sequence', () => {
+      assert.deepEqual(Array.from(oneTwo()), [1, 2])
+    })
+
+    it('only starts when we start consuming it', () => {
+      assert.isFalse(started)
+      const iterator = oneTwo()[Symbol.iterator]()
+      assert.isFalse(started)
+      const { value } = iterator.next()
+      assert.isTrue(started)
+      assert.equal(value, 1)
+    })
+
+    it('Array.from calls return', () => {
+      assert.isFalse(started)
+      Array.from(oneTwo)
+      assert.isFalse(started)
+    })
+
+    it('for..of calls return', () => {
+      assert.isFalse(started)
+      for (const item of oneTwo()) {
+        assert.equal(item, 1)
+        break
+      }
+      assert.isFalse(started)
+    })
+
+    it('spread operator calls return', () => {
+      assert.isFalse(started)
+      const [ a ] = oneTwo()
+      assert.equal(a, 1)
+      assert.isFalse(started)
+    })
+  })
 }

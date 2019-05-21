@@ -1,35 +1,35 @@
-Do androids dream of electric duck?
+## Do androids dream of electric duck?
 
-Welcome to my session,
+![A mechanican duck](./imgs/mechanical-duck.jpg "A mechanican duck")
+
+---
+![A book](./imgs/book.jpg "A book")
+
+Note: Welcome to my session,
 has anybody ever watched Blade runner or read "Do androids dream of electric sheep?"
 please raise your hands.
-
 Well for those who have not, let me tell you a spoiler-free introduction.
-
-Set in a dystopian future, most of human beings have left Earth for other planets. They managed the hardness of these unhospitable colonies with the help of humanoid replicants.
+---
+<!-- .slide: data-background="./imgs/andy-kelly-402111-unsplash.jpg" -->
+Note: Set in a dystopian future, most of human beings have left Earth for other planets. They managed the hardness of these unhospitable colonies with the help of humanoid replicants.
 The main character is a bounty hunter whose mission is to find and "retire" renegade androids.
-
-Androids development is now so advanced that the latest Nexus model is indistinguishable from authentic human beings. Some of them feature memory implant and are not aware of being synthetic humanoids. To tell if someone is an android, they have to pass the Voight-Kampff empathy test with questions such as:
+---
+Note: Androids development is now so advanced that the latest Nexus model is indistinguishable from authentic human beings. Some of them feature memory implant and are not aware of being synthetic humanoids. To tell if someone is an android, they have to pass the Voight-Kampff empathy test with questions such as:
 
 "You're watching TV. Suddenly you realise there's a wasp crawling on your arm. You..."
 
 But even this test is not 100% reliable anymore.
-
-It is a commonplace to say that the work of Philip K. Dick is centrally concerned with the question of what is real.
+---
+Note: It is a commonplace to say that the work of Philip K. Dick is centrally concerned with the question of what is real.
 "Do androids dream of electric sheep" looks at a particular branch of this question. What is fake ?
 And if you can make a fake seems to be authentic enough, does it matter ?
-
-Reading the book I realised that as engineers we have our own Voight-Kampff tests.
-
+---
+Note: Reading the book I realised that as engineers we have our own Voight-Kampff tests.
 We use it to determine what a piece of data is.
-
 We are not really concerned about authenticity but we want to know if a piece of data respects an interface: if it has a specific set of attributes and methods.
-
-
-
 This is about separating data and process.
 And data needs to be fit for a the process:
-
+---
 ```js
 function getTotal(items) {
   let total = 0
@@ -39,7 +39,7 @@ function getTotal(items) {
   return total
 }
 ```
-In the previous example I don't care if "items" is an array. But I should be able to use indeces on it.
+Note: In the previous example I don't care if "items" is an array. But I should be able to use indeces on it.
 Also I don't care what objects contains, as soon as they have a "getPrice" method that returns what I expect.
 
 We call this property polymorphism.
@@ -50,11 +50,7 @@ Polymorphism, comes with different flavours.
 In classical OOP different objects are based on one or more interfaces.
 Every interface constitutes a contract: a promise to support a set of methods and attributes.
 
-In dynamic languages (such as Python and Javascript), duck typing instead is widely used.
-
-"If it walks like a duck and it quacks like a duck, then it must be a duck"
-
-That translates in:
+---
 
 ```js
 function do(maybeDuck) {
@@ -66,7 +62,12 @@ function do(maybeDuck) {
   // not a duck, doing something else of throw an error
 }
 ```
+Note: In dynamic languages (such as Python and Javascript), duck typing instead is widely used.
 
+"If it walks like a duck and it quacks like a duck, then it must be a duck"
+
+That translates in:
+---
 As we are not obsessed on hunting android ducks, we are happy if our duck is an android one.
 For us is just as good as a real one.
 
