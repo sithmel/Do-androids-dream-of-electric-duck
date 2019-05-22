@@ -1,5 +1,6 @@
 /* eslint-env node, mocha */
 const { assert } = require('chai')
+
 const getIterator = () => ({
   c: 0,
   next () {

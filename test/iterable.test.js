@@ -1,5 +1,6 @@
 /* eslint-env node, mocha */
 const { assert } = require('chai')
+
 const getIterator = () => ({
   c: 0,
   next () {
@@ -13,7 +14,7 @@ const iterable = {
 }
 
 function run (iterab, func) {
-  const iterat = iterable[Symbol.iterator]()
+  const iterat = iterab[Symbol.iterator]()
   while (true) {
     const { value, done } = iterat.next()
     if (done) break
@@ -22,7 +23,7 @@ function run (iterab, func) {
 }
 
 function runFor (iterab, func) {
-  for (const item of iterable) {
+  for (const item of iterab) {
     func(item)
   }
 }
