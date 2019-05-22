@@ -6,7 +6,7 @@
 ![A book](./imgs/book.jpg "A book")
 
 Note: Welcome to my session,
-has anybody ever watched Blade runner or read "Do androids dream of electric sheep?"
+has anybody ever watched "Blade Runner" or read "Do androids dream of electric sheep?"
 please raise your hands.
 Well for those who have not, let me tell you a spoiler-free introduction.
 ---
@@ -20,28 +20,27 @@ Note: Androids development is now so advanced that the latest Nexus model is ind
 
 But even this test is not 100% reliable anymore.
 ---
+### Fake or authentic?
 Note: It is a commonplace to say that the work of Philip K. Dick is centrally concerned with the question of what is real.
 "Do androids dream of electric sheep" looks at a particular branch of this question. What is fake ?
 And if you can make a fake seems to be authentic enough, does it matter ?
 ---
+### Data authenticity?
 Note: Reading the book I realised that as engineers we have our own Voight-Kampff tests.
 We use it to determine what a piece of data is.
 We are not really concerned about authenticity but we want to know if a piece of data respects an interface: if it has a specific set of attributes and methods.
 This is about separating data and process.
 And data needs to be fit for a the process:
 ---
+### What is items?
 ```js
-function getTotal(items) {
-  let total = 0
-  for (let i = 0; i < items.length; i++) {
-    total += items[i].getPrice()
-  }
-  return total
+function getTotal(order) {
+  return order.getProductPrice() * order.quantity
 }
 ```
-Note: In the previous example I don't care if "items" is an array. But I should be able to use indeces on it.
-Also I don't care what objects contains, as soon as they have a "getPrice" method that returns what I expect.
-
+Note: In the previous example I don't care what is "order" as soon as it support the method "getProductPrice" and attribute "quantity".
+---
+### polymorphism
 We call this property polymorphism.
 
 polymorphism is a very powerful mechanism we can leverage to generalise algorithms that work across different type of objects. We use it a lot in testing. Stubs Mocks and spies are fake objects, just real enough to pass the test.
@@ -51,7 +50,13 @@ In classical OOP different objects are based on one or more interfaces.
 Every interface constitutes a contract: a promise to support a set of methods and attributes.
 
 ---
+### Duck typing
+Note: In dynamic languages (such as Python and Javascript), duck typing instead is widely used.
 
+"If it walks like a duck and it quacks like a duck, then it must be a duck"
+
+That translates in:
+---
 ```js
 function do(maybeDuck) {
   if (maybeDuck.walks && maybeDuck.quacks) {
@@ -62,46 +67,39 @@ function do(maybeDuck) {
   // not a duck, doing something else of throw an error
 }
 ```
-Note: In dynamic languages (such as Python and Javascript), duck typing instead is widely used.
-
-"If it walks like a duck and it quacks like a duck, then it must be a duck"
-
-That translates in:
----
-As we are not obsessed on hunting android ducks, we are happy if our duck is an android one.
+Note: As we are not obsessed on hunting android ducks, we are happy if our duck is an android one.
 For us is just as good as a real one.
-
-Now think about the concept of sequence. Can you guess what type is this sequence?
+---
+### Sequences and polymorphism
 ```js
 for (let i = 0; i < sequence.length; i++) {
   run(sequence[i])
 }
 ```
+Note: Now think about the concept of sequence. Can you guess what type is this sequence?
 Yes! it can be either a string or an array. But this is somewhat limiting.
-
-Think about this:
+---
+### Abstracting a sequence
 ```js
 for (let i = 0; i < 10; i++) {
   run(i)
 }
 ```
-This piece of code returns a sequence of numbers from 0 to 9
+Note: This piece of code returns a sequence of numbers from 0 to 9
 This sequence can't be expressed by an array (although it can be saved in one).
 We are not interested in accessing items of the sequence, in this case we are interested of the different values that "i" has over time
-
-We are also not interested about its length. A sequence can be infinite:
+---
+### Infinite sequence
 ```js
 let i = 0
 while (true) {
   run(i++)
 }
 ```
-
+Note: We are also not interested about its length. A sequence can be infinite:
 And of course storing an infinite sequence in an array is both unfeasible and meaningless.
-
-ES2015 provides a way to abstract away the concept of sequence. It's called "iterable".
-
-It allows to iterate over a sequence of numbers:
+---
+### iterables
 ```js
 function * countTo (max = Infinity) {
   let i = 0
@@ -114,6 +112,10 @@ for (const item of countTo(10)) {
   run(item)
 }
 ```
+Note: ES2015 provides a way to abstract away the concept of sequence. It's called "iterable".
+It allows to iterate over a sequence of numbers:
+---
+
 But also works with arrays, strings:
 ```js
 for (const item of [0, 10, 13, 5, 4]) {
@@ -124,7 +126,8 @@ for (const item of 'iterable') {
   run(item)
 }
 ```
-
+---
+### Iterables advantages
 Let's recap iterables advantage:
 - you don't need to store a sequence in memory. They can be used to work on enormous amount of data.
 - In some case are faster than array, because they don't allocate memory for new arrays when mapping/filtering
