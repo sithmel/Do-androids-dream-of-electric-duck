@@ -32,7 +32,7 @@ We are not really concerned about authenticity but we want to know if a piece of
 This is about separating data and process.
 And data needs to be fit for a the process:
 ---
-### What is items?
+### What is a order?
 ```js
 function getTotal(order) {
   return order.getProductPrice() * order.quantity
@@ -116,7 +116,7 @@ Note: ES2015 provides a way to abstract away the concept of sequence. It's calle
 It allows to iterate over a sequence of numbers:
 ---
 
-But also works with arrays, strings:
+But also works with arrays and strings (and others):
 ```js
 for (const item of [0, 10, 13, 5, 4]) {
   run(item)
@@ -129,12 +129,12 @@ for (const item of 'iterable') {
 ---
 ### Iterables advantages
 Let's recap iterables advantage:
-- you don't need to store a sequence in memory. They can be used to work on enormous amount of data.
+- you don't need to store a sequence in memory. They can be used to work on any amount of data.
 - In some case are faster than array, because they don't allocate memory for new arrays when mapping/filtering
 - they are part of the js api: Promise.all takes an iterable, spread operator takes an iterable, for .. of, Map/Set constructor takes iterables, and return iterables (keys, values methods).
 - readable and elegant
 
-There are also some disadvantage:
+There are also some disadvantages:
 - some operation, that rely on having the data in memory is awkward: sorting, shuffling for example
 - direct access using an index is not allowed
 
@@ -170,7 +170,7 @@ An iterator is an object that implement a function next. And this function retur
 
 { done: true } // this signals that the sequence is exhausted
 ```
-asyncIterators are similar but their next method returns a Promise that once resolved returns the same kind of objects.
+asyncIterators are similar but its next method returns a Promise that once resolved returns the same kind of objects.
 
 Both iterator/asyncIterator can implement optional methods such as throw/return. We will have a look at return in a few paragraphs.
 
@@ -196,15 +196,15 @@ const getIterator = () => ({
 ```
 and we can use it in this way:
 ```js
-function log (iterat) {
+function run (iterat, func) {
   while (true) {
     const { value, done } = iterat.next()
     if (done) break
-    console.log(value)
+    func(value)
   }
 }
 
-log(getIterator())
+run(getIterator(), (item) => { console.log(item) })
 ```
 and here is an example with an asyncIterator:
 ```js
@@ -216,15 +216,15 @@ const getAsyncIterator = () => ({
   }
 })
 
-async function log (iterat) {
+async function run (iterat, func) {
   while (true) {
     const { value, done } = await iterat.next()
     if (done) break
-    console.log(value)
+    func(value)
   }
 }
 
-log(getAsyncIterator())
+run(getIterator(), (item) => { console.log(item) })
 ```
 
 This pattern of generating a new iterator is very useful and it is part of the iterable/asyncIterable interface.
@@ -238,16 +238,16 @@ const iterable = {
 ```
 We can use this object like this:
 ```js
-function log (iterab) {
-  const iterat = iterable[Symbol.iterator]()
+function run (iterab, func) {
+  const iterat = iterab[Symbol.iterator]()
   while (true) {
     const { value, done } = iterat.next()
     if (done) break
-    console.log(value)
+    func(value)
   }
 }
 
-log(iterable)
+run(iterable, (item) => { console.log(item) })
 ```
 
 But ES2015 gives us more convenient ways to consume an iterable.
@@ -274,7 +274,7 @@ Symbol.iterator in arr // true
 Symbol.iterator in str // true
 ```
 
-We can define as async iterable, an object that has a method named "Symbol.asyncIterator" and this method returns an async iterator.
+An async iterable is an object that has a method named "Symbol.asyncIterator" and this method returns an async iterator.
 
 ```js
 const asyncIterable = {
@@ -283,16 +283,16 @@ const asyncIterable = {
 ```
 This can be consumed like this:
 ```js
-async function log (asyncIterab) {
-  const iterat = asyncIterab[Symbol.asyncIterator]()
+async function run (iterab, func) {
+  const asyncIterat = iterab[Symbol.asyncIterator]()
   while (true) {
-    const { value, done } = await iterat.next()
+    const { value, done } = await asyncIterat.next()
     if (done) break
-    console.log(value)
+    func(value)
   }
 }
 
-log(asyncIterable)
+run(asyncIterable, (item) => { console.log(item) })
 ```
 Or more simply:
 ```js
@@ -303,17 +303,236 @@ for await (const value of asyncIterable) {
 Pop quiz: how can you detect if an object provides the iterator or iterable interface ?
 Have you noticed how we are using duck typing polymorphism for these 2 interfaces ?
 
+---
+The generator function
+```js
+function * generatorFunction () {
+  yield 1
+  yield 2
+}
+
+const generatorObject = generatorFunction()
+
+for (const n of generatorObject) {
+  console.log(n)
+}
+```
+note: Building an iterable this way is a bit fiddly, but ES2015 gives us a language construct to build them easily.
+Let's have a look at the details
+---
+```js
+function * generatorFunction () {
+  yield 1
+  yield 2
+}
+
+const generatorObject = generatorFunction()
+
+typeof generatorFunction === 'function'
+typeof generatorObject === 'object'
+```
+Note: a generator function is a "function" and it returns a generator object and this very predictably is an "object".
+---
+Let me show how it works:
+```js
+function customGeneratorFunction () {
+  let numberOfCalls = 0
+
+  const obj = {
+    [Symbol.iterator] () {
+      return obj
+    },
+    next () {
+      numberOfCalls++
+      if (numberOfCalls > 2) {
+        return { done: true }
+      }
+      return { value: numberOfCalls, done: false }
+    }
+  }
+  return obj
+}
+```
+Note: Here's the first surprise! a generator Object is an iterable and an iterator at the same time.
+But there is more behind the scene that you should know
+---
+```js
+function * generatorFunction () {
+  // set up
+  try {
+    yield 1
+    yield 2
+  } finally {
+    // tear down
+  }
+}
+```
+Note: A generator object is designed to set up and tear down its own environment.
+The set up is lazy. It gets called only when the "next" method is called the first time.
+The tear down is transformed in a method called "return" and should be always called, after finishing with the iterator. Note that the tear down is never invoked if the set up wasn't invoked.
+---
+```js
+let started = false
+
+function * generatorFunction () {
+  started = true
+  try {
+    yield 1
+    yield 2
+  } finally {
+    started = false
+  }
+}
+
+const generatorObject = generatorFunction()
+const iterator = generatorObject[Symbol.iterator]()
+assert(started === false)
+
+iterator.next()
+assert(started === true)
+
+iterator.return()
+assert(started === false)
+
+```
+Note: let's test this.
+---
+```js
+function generatorFunction () {
+  let numberOfCalls = 0
+
+  const obj = {
+    [Symbol.iterator] () {
+      return obj
+    },
+    next () {
+      if (!numberOfCalls) {
+        started = true
+      }
+      numberOfCalls++
+      if (numberOfCalls > 2) {
+        started = false
+        return { done: true }
+      }
+      return { value: numberOfCalls, done: false }
+    },
+    return () {
+      started = false
+      return { done: true }
+    }
+  }
+  return obj
+}
+```
+Note: here's how a custom implementation looks like.
+---
+```js
+function arrayFrom (iterable) {
+  const array = []
+  const iterator = iterable[Symbol.iterator]()
+  try {
+    while (true) {
+      const { value, done } = iterator.next()
+      if (done) break
+      array.push(value)
+    }
+  } finally {
+    if (iterator.return) iterator.return()
+  }
+  return array
+}
+```
+Note: all native ES2015 methods (for..of, array.from, etc. ) support this semantic.
+Here's a custom implementation of Array.from that closely mirrors the native one.
+Note the duck typing style in "if (iterator.return) iterator.return()"
+---
+```js
+async function * asyncGeneratorFunction () {
+  started = true
+  try {
+    yield 1
+    yield 2
+  } finally {
+    started = false
+  }
+}
+```
+Note: async generator functions and async generator objects are very similar the the regular ones.
+With the only exception that they work with async iterables
+---
+```js
+function asyncGeneratorFunction () {
+  let numberOfCalls = 0
+
+  const obj = {
+    [Symbol.asyncIterator] () {
+      return obj
+    },
+    async next () {
+      if (!numberOfCalls) {
+        started = true
+      }
+      numberOfCalls++
+      if (numberOfCalls > 2) {
+        started = false
+        return { done: true }
+      }
+      return { value: numberOfCalls, done: false }
+    },
+    async return () {
+      started = false
+      return { done: true }
+    }
+  }
+  return obj
+}
+```
+---
+```js
+async function * readFromMongo (cfg) {
+  let client = await getMongoClient(cfg)
+  try {
+    const db = client.db(cfg.db)
+    const collection = db.collection(cfg.collection)
+    const cursor = collection.find(cfg.query)
+    while (await cursor.hasNext()) {
+      yield cursor.next() // this returns a promise
+    }
+  } finally {
+    client.close()
+  }
+}
+```
+Note: the set up and tear down phase are even more useful for async generator!
+---
+```js
+for await (const item of readFromMongo({ ... })) {
+
+}
+```
+---
+```js
+async function asyncArrayFrom (asyncIterable) {
+  const array = []
+  const iterator = asyncIterable[Symbol.asyncIterator]()
+  try {
+    while (true) {
+      const { value, done } = await iterator.next()
+      if (done) break
+      array.push(value)
+    }
+  } finally {
+    if (iterator.return) await iterator.return()
+  }
+  return array
+}
+
+// can only run in a function
+const arr = await asyncArrayFrom(readFromMongo({ ... }))
+```
+Note:
+---
 
 
-* iterators
-* iterables
-* return
-* function generator
-* reimplement function generator
-Native iterables, native methods
-* reiMplement for loop
 
-* asyncIterators
-* asyncIterables
-
-Native asyncIterables
+More: bidirectional iterator

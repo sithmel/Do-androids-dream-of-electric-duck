@@ -45,6 +45,10 @@ for (const oneTwo of [oneTwoFuncGen, oneTwoCustom]) {
       assert.typeOf(oneTwo, 'function')
     })
 
+    it('generator object is an object', () => {
+      assert.equal(typeof oneTwo(), 'object')
+    })
+
     it('generator object is iterable', () => {
       const genObj = oneTwo()
       assert.isTrue(Symbol.iterator in genObj)
