@@ -6,19 +6,20 @@
 ![A book](./imgs/book.jpg "A book")
 
 Note: Welcome to my session,
-has anybody ever watched "Blade Runner" or read "Do androids dream of electric sheep?"
+has anybody here ever watched "Blade Runner" or read "Do androids dream of electric sheep?"
 please raise your hands.
 Well for those who have not, let me tell you a spoiler-free introduction.
 ---
 <!-- .slide: data-background="./imgs/andy-kelly-402111-unsplash.jpg" -->
 Note: Set in a dystopian future, most of human beings have left Earth for other planets. They managed the hardness of these unhospitable colonies with the help of humanoid replicants.
-The main character is a bounty hunter whose mission is to find and "retire" renegade androids.
+The main character is a bounty hunter whose mission is to find and "retire" renegade androids, hidden on the post-apocalyptic earth.
 ---
-Note: Androids development is now so advanced that the latest Nexus model is indistinguishable from authentic human beings. Some of them feature memory implant and are not aware of being synthetic humanoids. To tell if someone is an android, they have to pass the Voight-Kampff empathy test with questions such as:
+Note: Androids development is now so advanced that the latest Nexus model is indistinguishable from authentic human beings. Some of them feature memory implants and are not aware of being synthetic humanoids.
+Bounty hunters are able to recognise androids administering them the Voight-Kampff empathy test. Asking questions designed to elicit a emotional response, like for example:
 
 "You're watching TV. Suddenly you realise there's a wasp crawling on your arm. You..."
 
-But even this test is not 100% reliable anymore.
+But even this test is not 100% reliable with the latest Nexus model.
 ---
 ### Fake or authentic?
 Note: It is a commonplace to say that the work of Philip K. Dick is centrally concerned with the question of what is real.
@@ -45,7 +46,7 @@ We call this property polymorphism.
 
 polymorphism is a very powerful mechanism we can leverage to generalise algorithms that work across different type of objects. We use it a lot in testing. Stubs Mocks and spies are fake objects, just real enough to pass the test.
 
-Polymorphism, comes with different flavours.
+Polymorphism, comes in different flavours.
 In classical OOP different objects are based on one or more interfaces.
 Every interface constitutes a contract: a promise to support a set of methods and attributes.
 
@@ -76,7 +77,7 @@ for (let i = 0; i < sequence.length; i++) {
   run(sequence[i])
 }
 ```
-Note: Now think about the concept of sequence. Can you guess what type is this sequence?
+Note: Now, think about the concept of sequence. Can you guess what type is this sequence?
 Yes! it can be either a string or an array. But this is somewhat limiting.
 ---
 ### Abstracting a sequence
@@ -155,8 +156,6 @@ const stream = fs.createReadStream(filepath, {
 });
 stream.on('data', run);
 ```
-Event based stream can be a bit "messy".
-asyncIterable is clearer.
 
 Now we talked about the advantages of polymorphism and how this makes working with sequences easy and readable.
 Let's take a closer look at iterables and asyncIterables. How do they work in detail?
@@ -172,7 +171,7 @@ An iterator is an object that implement a function next. And this function retur
 ```
 asyncIterators are similar but its next method returns a Promise that once resolved returns the same kind of objects.
 
-Both iterator/asyncIterator can implement optional methods such as throw/return. We will have a look at return in a few paragraphs.
+Both iterator/asyncIterator can implement optional methods such as throw/return. We will have a look at return in a few paragraphs/slides.
 
 Here's an example:
 ```js
@@ -256,7 +255,7 @@ for (const value of iterable) {
   console.log(value)
 }
 ```
-Another way to consume iterables is using the spreap operator:
+Another way to consume iterables is using the spread operator:
 ```js
 const [a, b] = iterable // only interested in the first 2 values
 ```
@@ -532,7 +531,37 @@ const arr = await asyncArrayFrom(readFromMongo({ ... }))
 ```
 Note:
 ---
+```js
+function flat(iterable) {
+  for (const item of iterable) {
+    if (Symbol.iterator in item && typeof item !== 'string'){
+      yield * flat(item)
+    } else {
+      yield item
+    }
+  }
+}
+```
+Note: yield *
+---
 
+```js
+function bidi() {
+  try {
+    const value = yield
+    yield value    
+  } catch (e) {
+    console.log(err.message)
+  }
+}
 
+const iterat = bidi()[Symbol.iterator]
+iterat.next('hello')
+const { value } = iterat.next()
+console.log(value)
+// hello
 
-More: bidirectional iterator
+const iterat = bidi()[Symbol.iterator]
+iterat.throw(new Error('Oh No!'))
+// Oh No!
+```
