@@ -14,6 +14,7 @@ Well for those who have not, let me tell you a spoiler-free introduction.
 Note: Set in a dystopian future, most of human beings have left Earth for other planets. They managed the hardness of these unhospitable colonies with the help of humanoid replicants.
 The main character is a bounty hunter whose mission is to find and "retire" renegade androids, hidden on the post-apocalyptic earth.
 ---
+<!-- .slide: data-background="./imgs/alex-knight-199368-unsplash.jpg" -->
 Note: Androids development is now so advanced that the latest Nexus model is indistinguishable from authentic human beings. Some of them feature memory implants and are not aware of being synthetic humanoids.
 Bounty hunters are able to recognise androids administering them the Voight-Kampff empathy test. Asking questions designed to elicit a emotional response, like for example:
 
@@ -22,26 +23,28 @@ Bounty hunters are able to recognise androids administering them the Voight-Kamp
 But even this test is not 100% reliable with the latest Nexus model.
 ---
 ### Fake or authentic?
+<!-- .slide: data-background="./imgs/robot-hand.jpg" -->
 Note: It is a commonplace to say that the work of Philip K. Dick is centrally concerned with the question of what is real.
 "Do androids dream of electric sheep" looks at a particular branch of this question. What is fake ?
 And if you can make a fake seems to be authentic enough, does it matter ?
----
-### Data authenticity?
-Note: Reading the book I realised that as engineers we have our own Voight-Kampff tests.
+
+Reading the book I realised that as engineers we have our own Voight-Kampff tests.
 We use it to determine what a piece of data is.
 We are not really concerned about authenticity but we want to know if a piece of data respects an interface: if it has a specific set of attributes and methods.
 This is about separating data and process.
-And data needs to be fit for a the process:
+And data needs to be fit for a process:
 ---
-### What is a order?
+### What is an order?
 ```js
 function getTotal(order) {
   return order.getProductPrice() * order.quantity
 }
 ```
-Note: In the previous example I don't care what is "order" as soon as it support the method "getProductPrice" and attribute "quantity".
+Note: In this example I don't care what is "order" as soon as it support the method "getProductPrice" and attribute "quantity".
 ---
 ### polymorphism
+<!-- .slide: data-background="./imgs/plug.jpg" -->
+Note:
 We call this property polymorphism.
 
 polymorphism is a very powerful mechanism we can leverage to generalise algorithms that work across different type of objects. We use it a lot in testing. Stubs Mocks and spies are fake objects, just real enough to pass the test.
@@ -52,12 +55,15 @@ Every interface constitutes a contract: a promise to support a set of methods an
 
 ---
 ### Duck typing
+![A book](./imgs/pig.jpg "A pig nose")
+
 Note: In dynamic languages (such as Python and Javascript), duck typing instead is widely used.
 
 "If it walks like a duck and it quacks like a duck, then it must be a duck"
 
 That translates in:
 ---
+<!-- .slide: data-background="./imgs/ducks.jpg" -->
 ```js
 function do(maybeDuck) {
   if (maybeDuck.walks && maybeDuck.quacks) {
@@ -65,7 +71,7 @@ function do(maybeDuck) {
     maybeDuck.quacks('I am a duck!');
     return;
   }
-  // not a duck, doing something else of throw an error
+  // not a duck :-(
 }
 ```
 Note: As we are not obsessed on hunting android ducks, we are happy if our duck is an android one.
@@ -116,8 +122,7 @@ for (const item of countTo(10)) {
 Note: ES2015 provides a way to abstract away the concept of sequence. It's called "iterable".
 It allows to iterate over a sequence of numbers:
 ---
-
-But also works with arrays and strings (and others):
+### Arrays and strings
 ```js
 for (const item of [0, 10, 13, 5, 4]) {
   run(item)
@@ -127,63 +132,74 @@ for (const item of 'iterable') {
   run(item)
 }
 ```
+Note:
+But also works with arrays and strings (and others):
 ---
-### Iterables advantages
+### Pros
+- memory <!-- .element: class="fragment" data-fragment-index="1" -->
+- speed at scale <!-- .element: class="fragment" data-fragment-index="2" --> 
+- JS integration <!-- .element: class="fragment" data-fragment-index="3" --> 
+- readable and elegant <!-- .element: class="fragment" data-fragment-index="4" --> 
+
+Note:
 Let's recap iterables advantage:
 - you don't need to store a sequence in memory. They can be used to work on any amount of data.
 - In some case are faster than array, because they don't allocate memory for new arrays when mapping/filtering
 - they are part of the js api: Promise.all takes an iterable, spread operator takes an iterable, for .. of, Map/Set constructor takes iterables, and return iterables (keys, values methods).
 - readable and elegant
+---
+### Cons
+- slower for small lengths  <!-- .element: class="fragment" data-fragment-index="1" -->
+- some operations are awkward  <!-- .element: class="fragment" data-fragment-index="2" -->
 
+Note:
 There are also some disadvantages:
 - some operation, that rely on having the data in memory is awkward: sorting, shuffling for example
 - direct access using an index is not allowed
-
-ES2018 gives us a way to abstract asynchronous sequences too. It is called asyncIterables.
+---
+<!-- .slide: data-background="./imgs/chuttersnap-1306524-unsplash.jpg" -->
+### Async iterables
+Note: ES2018 gives us a way to abstract asynchronous sequences too. It is called asyncIterables.
 They can be used for example with files and network resources.
+
+---
 ```js
-const stream = fs.createReadStream(filepath, { encoding: 'utf8' })
+const stream = fs.createReadStream(filepath, {
+  encoding: 'utf8'
+})
+```
+```js
 for await (const item of stream) {
   run(item)
 }
 ```
-From node 10, every stream is asyncIterable.
-
-Compare this to:
+Instead of:
 ```js
-const stream = fs.createReadStream(filepath, {
-  encoding: 'utf8'
-});
 stream.on('data', run);
 ```
-
-Now we talked about the advantages of polymorphism and how this makes working with sequences easy and readable.
+Note: From node 10, every stream is asyncIterable.
+---
+<!-- .slide: data-background="./imgs/bill-oxford-1680473-unsplash.jpg" -->
+### How do they work
+Note: Now we talked about the advantages of polymorphism and how this makes working with sequences easy and readable.
 Let's take a closer look at iterables and asyncIterables. How do they work in detail?
-
-
-The basic building blocks are the iterator/asyncIterator and iterable/asyncIterable interfaces. Let's start with the first.
+---
+#### Iterator
+```js
+const { value, done } = iterator.next()
+```
+```js
+const { value, done } = await asyncIterator.next()
+```
+Note: The basic building blocks are the iterator/asyncIterator and iterable/asyncIterable interfaces. Let's start with the first.
 
 An iterator is an object that implement a function next. And this function returns an object with this shape:
-```js
-{ value: 'the value returned', done: false }
 
-{ done: true } // this signals that the sequence is exhausted
-```
 asyncIterators are similar but its next method returns a Promise that once resolved returns the same kind of objects.
 
 Both iterator/asyncIterator can implement optional methods such as throw/return. We will have a look at return in a few paragraphs/slides.
-
-Here's an example:
-```js
-const iterator = {
-  c: 0,
-  next () {
-    if (this.c === 3) return { done: true }
-    return { value: this.c++, done: false }
-  }
-}
-```
-for convenience we can build a function that return an iterator (so that we can reuse it multiple times):
+---
+#### get iterator
 ```js
 const getIterator = () => ({
   c: 0,
@@ -193,7 +209,10 @@ const getIterator = () => ({
   }
 })
 ```
-and we can use it in this way:
+Note: Here's an example:
+for convenience we can build a function that return an iterator (so that we can reuse it multiple times):
+---
+#### use iterator
 ```js
 function run (iterat, func) {
   while (true) {
@@ -205,7 +224,9 @@ function run (iterat, func) {
 
 run(getIterator(), (item) => { console.log(item) })
 ```
-and here is an example with an asyncIterator:
+Note: and we can use it in this way:
+---
+#### get async iterator
 ```js
 const getAsyncIterator = () => ({
   c: 0,
@@ -214,7 +235,11 @@ const getAsyncIterator = () => ({
     return { value: this.c++, done: false }
   }
 })
-
+```
+Note: and here is an example with an asyncIterator
+---
+#### use async iterator
+```js
 async function run (iterat, func) {
   while (true) {
     const { value, done } = await iterat.next()
@@ -223,19 +248,20 @@ async function run (iterat, func) {
   }
 }
 
-run(getIterator(), (item) => { console.log(item) })
+run(getAsyncIterator(), (item) => { console.log(item) })
 ```
-
-This pattern of generating a new iterator is very useful and it is part of the iterable/asyncIterable interface.
-
-We can define as iterable an object that has a method named "Symbol.iterator" and this method returns an iterator.
-
+---
+#### Iterable
 ```js
 const iterable = {
   [Symbol.iterator]: getIterator
 }
 ```
-We can use this object like this:
+Note:
+This pattern of generating a new iterator is very useful and it is part of the iterable/asyncIterable interface.
+We can define as iterable an object that has a method named "Symbol.iterator" and this method returns an iterator.
+---
+#### Use iterable
 ```js
 function run (iterab, func) {
   const iterat = iterab[Symbol.iterator]()
@@ -248,39 +274,47 @@ function run (iterab, func) {
 
 run(iterable, (item) => { console.log(item) })
 ```
-
-But ES2015 gives us more convenient ways to consume an iterable.
+Note: We can use this object like this:
+---
+#### for..of
 ```js
 for (const value of iterable) {
   console.log(value)
 }
 ```
-Another way to consume iterables is using the spread operator:
+Note: But ES2015 gives us more convenient ways to consume an iterable.
+---
+#### other ways
 ```js
-const [a, b] = iterable // only interested in the first 2 values
+const [a, b] = iterable // only first 2 values
 ```
-and of course, getting an array:
 ```js
 const arr = Array.from(iterable)
 // or
 const arr2 = [...iterable]
 ```
-All of this can also be used by regular strings and arrays because they ARE iterables.
+Note: Another way to consume iterables is using the spread operator:
+and of course, getting an array:
+---
+#### Native types
 ```js
 const arr = [1, 2, 3]
 const str = 'hello'
 Symbol.iterator in arr // true
 Symbol.iterator in str // true
 ```
-
-An async iterable is an object that has a method named "Symbol.asyncIterator" and this method returns an async iterator.
-
+Note:
+All of this can also be used by regular strings and arrays because they ARE iterables.
+---
+#### async iterable
 ```js
 const asyncIterable = {
   [Symbol.asyncIterator]: getAsyncIterator
 }
 ```
-This can be consumed like this:
+Note: An async iterable is an object that has a method named "Symbol.asyncIterator" and this method returns an async iterator.
+---
+#### Use async iterable
 ```js
 async function run (iterab, func) {
   const asyncIterat = iterab[Symbol.asyncIterator]()
@@ -293,17 +327,20 @@ async function run (iterab, func) {
 
 run(asyncIterable, (item) => { console.log(item) })
 ```
-Or more simply:
+Note: This can be consumed like this:
+---
+#### for await..of
 ```js
 for await (const value of asyncIterable) {
   console.log(value)
 }
 ```
+Note:
 Pop quiz: how can you detect if an object provides the iterator or iterable interface ?
 Have you noticed how we are using duck typing polymorphism for these 2 interfaces ?
 
 ---
-The generator function
+#### The generator function
 ```js
 function * generatorFunction () {
   yield 1
@@ -332,29 +369,29 @@ typeof generatorObject === 'object'
 ```
 Note: a generator function is a "function" and it returns a generator object and this very predictably is an "object".
 ---
-Let me show how it works:
+#### generator function anatomy (simplified)
 ```js
 function customGeneratorFunction () {
-  let numberOfCalls = 0
+
+ let numberOfCalls = 0
 
   const obj = {
-    [Symbol.iterator] () {
-      return obj
-    },
+    [Symbol.iterator] () { return obj }, // !?
     next () {
       numberOfCalls++
-      if (numberOfCalls > 2) {
-        return { done: true }
-      }
+      if (numberOfCalls > 2) return { done: true }
       return { value: numberOfCalls, done: false }
     }
   }
   return obj
 }
 ```
-Note: Here's the first surprise! a generator Object is an iterable and an iterator at the same time.
+Note:
+Let me show how it works:
+Here's the first surprise! a generator Object is an iterable and an iterator at the same time.
 But there is more behind the scene that you should know
 ---
+#### set up/tear down
 ```js
 function * generatorFunction () {
   // set up
@@ -370,6 +407,7 @@ Note: A generator object is designed to set up and tear down its own environment
 The set up is lazy. It gets called only when the "next" method is called the first time.
 The tear down is transformed in a method called "return" and should be always called, after finishing with the iterator. Note that the tear down is never invoked if the set up wasn't invoked.
 ---
+#### testing set up/tear down
 ```js
 let started = false
 
@@ -382,7 +420,9 @@ function * generatorFunction () {
     started = false
   }
 }
-
+```
+---
+```js
 const generatorObject = generatorFunction()
 const iterator = generatorObject[Symbol.iterator]()
 assert(started === false)
@@ -396,18 +436,15 @@ assert(started === false)
 ```
 Note: let's test this.
 ---
+#### generator function anatomy (less simplified)
 ```js
 function generatorFunction () {
   let numberOfCalls = 0
 
   const obj = {
-    [Symbol.iterator] () {
-      return obj
-    },
+    [Symbol.iterator] () { return obj },
     next () {
-      if (!numberOfCalls) {
-        started = true
-      }
+      if (!numberOfCalls) started = true
       numberOfCalls++
       if (numberOfCalls > 2) {
         started = false
@@ -425,6 +462,7 @@ function generatorFunction () {
 ```
 Note: here's how a custom implementation looks like.
 ---
+#### Anatomy of Array.from
 ```js
 function arrayFrom (iterable) {
   const array = []
@@ -436,7 +474,7 @@ function arrayFrom (iterable) {
       array.push(value)
     }
   } finally {
-    if (iterator.return) iterator.return()
+    if (iterator.return) iterator.return() // quack!
   }
   return array
 }
