@@ -10,13 +10,17 @@ Note: Welcome to my session,
 has anybody here ever watched "Blade Runner" or read "Do androids dream of electric sheep?"
 please raise your hands.
 Well for those who have not, let me tell you a spoiler-free introduction.
----
-<!-- .slide: data-background="./imgs/andy-kelly-402111-unsplash.jpg" -->
-Note: Set in a dystopian future, most of human beings have left Earth for other planets. They managed the hardness of these unhospitable colonies with the help of humanoid replicants.
+Set in a dystopian future, most of human beings have left Earth for other planets. They managed the hardness of these unhospitable colonies with the help of humanoid replicants.
 The main character is a bounty hunter whose mission is to find and "retire" renegade androids, hidden on the post-apocalyptic earth.
 ---
-<!-- .slide: data-background="./imgs/alex-knight-199368-unsplash.jpg" -->
-Note: Androids development is now so advanced that the latest Nexus model is indistinguishable from authentic human beings. Some of them feature memory implants and are not aware of being synthetic humanoids.
+####  Who is the android?
+<!-- .slide: data-background="./imgs/andy-kelly-402111-unsplash.jpg" -->
+Note:
+Androids development is now so advanced that the latest Nexus model is indistinguishable from authentic human beings. Some of them feature memory implants and are not aware of being synthetic humanoids.
+---
+#### Voight-Kampff empathy test
+<!-- .slide: data-background="./imgs/motah-725471-unsplash.jpg" -->
+Note: 
 Bounty hunters are able to recognise androids administering them the Voight-Kampff empathy test. Asking questions designed to elicit a emotional response, like for example:
 
 "You're watching TV. Suddenly you realise there's a wasp crawling on your arm. You..."
@@ -120,8 +124,8 @@ for (const item of countTo(10)) {
   run(item)
 }
 ```
-Note: ES2015 provides a way to abstract away the concept of sequence. It's called "iterable".
-It allows to iterate over a sequence of numbers:
+Note: ES2015 provides a way to abstract the concept of sequence. It's called "iterable".
+It allows to iterate over any sequence:
 ---
 ### Arrays and strings
 ```js
@@ -180,14 +184,13 @@ stream.on('data', run);
 ```
 Note: From node 10, every stream is asyncIterable.
 ---
-<!-- .slide: data-background="./imgs/bill-oxford-1680473-unsplash.jpg" -->
+<!-- .slide: data-background="./imgs/franck-v-517860-unsplash.jpg" -->
 ### Anatomy
 Note: Now we talked about the advantages of polymorphism and how this makes working with sequences easy and readable.
 Let's take a closer look at iterables and asyncIterables. How do they work in detail?
 ---
 #### Iterator/async Iterator
-<!-- .slide: data-background="./imgs/capacitors-chip-circuit-159220.jpg" -->
----
+<!-- .slide: data-background="./imgs/franck-v-795965-unsplash.jpg" -->
 ```js
 const { value, done } = iterator.next()
 ```
@@ -200,7 +203,7 @@ An iterator is an object that implement a function next. And this function retur
 
 asyncIterators are similar but its next method returns a Promise that once resolved returns the same kind of objects.
 
-Both iterator/asyncIterator can implement optional methods such as throw/return. We will have a look at return in a few paragraphs/slides.
+Both iterator/asyncIterator can implement other optional methods. We will have a look at them later.
 ---
 #### get iterator
 ```js
@@ -255,8 +258,7 @@ run(getAsyncIterator(), (item) => { console.log(item) })
 ```
 ---
 #### Iterable
-<!-- .slide: data-background="./imgs/franck-v-517860-unsplash.jpg" -->
----
+<!-- .slide: data-background="./imgs/franck-v-795970-unsplash.jpg" -->
 ```js
 const iterable = {
   [Symbol.iterator]: getIterator
@@ -318,7 +320,6 @@ All of this can also be used by regular strings and arrays because they ARE iter
 ---
 #### async iterable
 <!-- .slide: data-background="./imgs/alex-knight-199368-unsplash.jpg" -->
----
 ```js
 const asyncIterable = {
   [Symbol.asyncIterator]: getAsyncIterator
@@ -348,12 +349,15 @@ for await (const value of asyncIterable) {
 }
 ```
 Note:
-Pop quiz: how can you detect if an object provides the iterator or iterable interface ?
-Have you noticed how we are using duck typing polymorphism for these 2 interfaces ?
-
+Or better like this.
+---
+<!-- .slide: data-background="./imgs/sharon-mccutcheon-665638-unsplash.jpg" -->
+### Pop quiz
+* how can you detect if an object provides the iterator or iterable interface ? <!-- .element: class="fragment" data-fragment-index="1" -->
+* How do you call this technique ? <!-- .element: class="fragment" data-fragment-index="2" -->
 ---
 #### The generator function
-<!-- .slide: data-background="./imgs/artificial-intelligence-machine-machine-learning-185725.jpg" -->
+<!-- .slide: data-background="./imgs/arseny-togulev-1513013-unsplash.jpg" -->
 ---
 ```js
 function * generatorFunction () {
@@ -498,7 +502,7 @@ Here's a custom implementation of Array.from that closely mirrors the native one
 Note the duck typing style in "if (iterator.return) iterator.return()"
 ---
 #### The async generator function
-<!-- .slide: data-background="./imgs/artificial-intelligence-machine-machine-learning-185725.jpg" -->
+<!-- .slide: data-background="./imgs/franck-v-516603-unsplash.jpg" -->
 ---
 ```js
 async function * asyncGeneratorFunction () {
@@ -586,8 +590,9 @@ const arr = await asyncArrayFrom(readFromMongo({ ... }))
 ```
 ---
 ### delegation
+<!-- .slide: data-background="./imgs/magnus-engo-1522003-unsplash.jpg" -->
 ```js
-function flat(iterable) {
+function * flat(iterable) {
   for (const item of iterable) {
     if (Symbol.iterator in item && typeof item !== 'string'){
       yield * flat(item) // <- this
@@ -636,5 +641,23 @@ For this reason there is an extra feature to send data back to the iterator. I w
 - yield * <!-- .element: class="fragment" data-fragment-index="7" --> 
 - bidirectional iterator <!-- .element: class="fragment" data-fragment-index="8" --> 
 ---
+<!-- .slide: data-background="./imgs/nasa-89125-unsplash.jpg" -->
+#### yield 'world'
+Note:
+Iterables are an underused feature of modern javascript.
+But they are indeed very powerful.
+
+Iterables and asyncIterables allows to break free from memory constraints, and go beyond what is possible to do with Arrays.
+
+They achieve that even improving clarity and intention of your code.
+
+They are already deeply integrated in Js and ready to be used.
+
+The space is just a for of .. loop away.
+---
 #### Thanks
 <!-- .slide: data-background="./imgs/franck-v-795974-unsplash.jpg" -->
+---
+<!-- .slide: data-background="./imgs/tim-mossholder-562497-unsplash.jpg" -->
+check out iter-tools.
+the missing iterable toolbox!
