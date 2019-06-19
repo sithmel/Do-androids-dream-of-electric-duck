@@ -2,6 +2,7 @@
 
 ![A mechanican duck](./imgs/mechanical-duck.jpg "A mechanican duck")
 
+@sithmel
 ---
 ![A book](./imgs/book.jpg "A book")
 
@@ -180,11 +181,13 @@ stream.on('data', run);
 Note: From node 10, every stream is asyncIterable.
 ---
 <!-- .slide: data-background="./imgs/bill-oxford-1680473-unsplash.jpg" -->
-### How do they work
+### Anatomy
 Note: Now we talked about the advantages of polymorphism and how this makes working with sequences easy and readable.
 Let's take a closer look at iterables and asyncIterables. How do they work in detail?
 ---
-#### Iterator
+#### Iterator/async Iterator
+<!-- .slide: data-background="./imgs/capacitors-chip-circuit-159220.jpg" -->
+---
 ```js
 const { value, done } = iterator.next()
 ```
@@ -252,6 +255,8 @@ run(getAsyncIterator(), (item) => { console.log(item) })
 ```
 ---
 #### Iterable
+<!-- .slide: data-background="./imgs/franck-v-517860-unsplash.jpg" -->
+---
 ```js
 const iterable = {
   [Symbol.iterator]: getIterator
@@ -300,13 +305,20 @@ and of course, getting an array:
 ```js
 const arr = [1, 2, 3]
 const str = 'hello'
+const map = new Map()
+const set = new Set()
+
 Symbol.iterator in arr // true
 Symbol.iterator in str // true
+Symbol.iterator in map // true
+Symbol.iterator in set // true
 ```
 Note:
 All of this can also be used by regular strings and arrays because they ARE iterables.
 ---
 #### async iterable
+<!-- .slide: data-background="./imgs/alex-knight-199368-unsplash.jpg" -->
+---
 ```js
 const asyncIterable = {
   [Symbol.asyncIterator]: getAsyncIterator
@@ -341,6 +353,8 @@ Have you noticed how we are using duck typing polymorphism for these 2 interface
 
 ---
 #### The generator function
+<!-- .slide: data-background="./imgs/artificial-intelligence-machine-machine-learning-185725.jpg" -->
+---
 ```js
 function * generatorFunction () {
   yield 1
@@ -376,8 +390,8 @@ function customGeneratorFunction () {
  let numberOfCalls = 0
 
   const obj = {
-    [Symbol.iterator] () { return obj }, // !?
-    next () {
+    [Symbol.iterator] () { return obj }, // it's an iterable
+    next () { // it's an iterator too
       numberOfCalls++
       if (numberOfCalls > 2) return { done: true }
       return { value: numberOfCalls, done: false }
@@ -483,6 +497,9 @@ Note: all native ES2015 methods (for..of, array.from, etc. ) support this semant
 Here's a custom implementation of Array.from that closely mirrors the native one.
 Note the duck typing style in "if (iterator.return) iterator.return()"
 ---
+#### The async generator function
+<!-- .slide: data-background="./imgs/artificial-intelligence-machine-machine-learning-185725.jpg" -->
+---
 ```js
 async function * asyncGeneratorFunction () {
   started = true
@@ -567,22 +584,24 @@ async function asyncArrayFrom (asyncIterable) {
 // can only run in a function
 const arr = await asyncArrayFrom(readFromMongo({ ... }))
 ```
-Note:
 ---
+### delegation
 ```js
 function flat(iterable) {
   for (const item of iterable) {
     if (Symbol.iterator in item && typeof item !== 'string'){
-      yield * flat(item)
+      yield * flat(item) // <- this
     } else {
       yield item
     }
   }
 }
-```
-Note: yield *
----
 
+flat([[1, 2, 3],[4, 5, [6]]]]); // 1, 2, 3, 4, 5, 6
+```
+---
+### Not only sequences
+<!-- .slide: data-background="./imgs/aluminum-blur-blurry-1432797.jpg" -->
 ```js
 function bidi() {
   try {
@@ -603,3 +622,19 @@ const iterat = bidi()[Symbol.iterator]
 iterat.throw(new Error('Oh No!'))
 // Oh No!
 ```
+Note:
+The iterator abstraction can be used to describe a sequence of actions driven by a function acting as a scheduler.
+For this reason there is an extra feature to send data back to the iterator. I won't explain this further.
+---
+#### Takeaways
+- polymorphism <!-- .element: class="fragment" data-fragment-index="1" -->
+- duck typing <!-- .element: class="fragment" data-fragment-index="2" --> 
+- iterator/iterable <!-- .element: class="fragment" data-fragment-index="3" --> 
+- asyncIterator/asyncIterable <!-- .element: class="fragment" data-fragment-index="4" --> 
+- generator functions <!-- .element: class="fragment" data-fragment-index="5" --> 
+- async generator functions <!-- .element: class="fragment" data-fragment-index="6" --> 
+- yield * <!-- .element: class="fragment" data-fragment-index="7" --> 
+- bidirectional iterator <!-- .element: class="fragment" data-fragment-index="8" --> 
+---
+#### Thanks
+<!-- .slide: data-background="./imgs/franck-v-795974-unsplash.jpg" -->
