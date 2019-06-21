@@ -7,7 +7,7 @@
   "scripts": {
     "test": "mocha",
     "start": "reveal-md --css custom.css README.md",
-    "build": "reveal-md --css custom.css README.md --static docs --static-dirs=imgs --assets-dir assets"
+    "build": "reveal-md --css custom.css README.md --static docs --static-dirs=imgs --assets-dir assets --title 'Do androids dream of electric duck?'"
   },
   "keywords": [],
   "repository": "git@github.com:sithmel/do-androids-dream-of-electric-duck.git",
