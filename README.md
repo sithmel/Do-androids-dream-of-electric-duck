@@ -6,8 +6,10 @@
 ---
 ![A book](./imgs/book.jpg "A book")
 
-Note: Welcome to my session,
-has anybody here ever watched "Blade Runner" or read "Do androids dream of electric sheep?"
+Note:
+Welcome to my session,
+
+Has anybody here ever watched "Blade Runner" or read "Do androids dream of electric sheep?"
 please raise your hands.
 
 
@@ -20,7 +22,7 @@ The main character is a bounty hunter whose mission is to find and "retire" rene
 ####  Who is the android?
 <!-- .slide: data-background="./imgs/andy-kelly-402111-unsplash.jpg" -->
 Note:
-Androids development is now so advanced that the latest Nexus model is indistinguishable from authentic human beings. Some of them feature memory implants and are not aware of being synthetic humanoids.
+Androids development is now so advanced that the latest Nexus model is indistinguishable from an authentic human being. Some of the androids feature memory implants and are not aware of being synthetic humanoids.
 ---
 #### Voight-Kampff empathy test
 <!-- .slide: data-background="./imgs/motah-725471-unsplash.jpg" -->
@@ -37,7 +39,7 @@ Note: It is a commonplace to say that the work of Philip K. Dick is centrally co
 
 "Do androids dream of electric sheep" looks at a particular branch of this question. What is fake ?
 
-And if you can make a fake seems to be authentic enough, does it matter ?
+And if you can make a fake seems to be authentic enough, does it matter?
 
 Reading the book I realised that as engineers we have our own Voight-Kampff tests.
 
@@ -69,6 +71,7 @@ In classical OOP different objects are based on one or more interfaces.
 
 Every interface constitutes a contract: a promise to support a set of methods and attributes.
 
+This constitutes the base of what we call a "typing system"
 ---
 ### Duck typing
 ![A book](./imgs/pig.jpg "A pig nose")
@@ -77,7 +80,7 @@ Note: In dynamic languages (such as Python and Javascript), duck typing instead 
 
 "If it walks like a duck and it quacks like a duck, then it must be a duck"
 
-That translates in ...
+That translates into ...
 ---
 <!-- .slide: data-background="./imgs/ducks.jpg" -->
 ```js
@@ -161,7 +164,7 @@ But also works with arrays and strings (and others):
 - readable and elegant <!-- .element: class="fragment" data-fragment-index="4" --> 
 
 Note:
-Let's recap iterables advantage:
+Before moving on, let's talk about iterables advantages:
 - you don't need to store a sequence in memory. They can be used to work on any amount of data.
 - In some case are faster than array, because they don't allocate memory for new arrays when mapping/filtering
 - they are part of the js api: Promise.all takes an iterable, spread operator takes an iterable, for .. of, Map/Set constructor takes iterables, and return iterables (keys, values methods).
@@ -169,7 +172,7 @@ Let's recap iterables advantage:
 ---
 ### Cons
 - slower for small lengths  <!-- .element: class="fragment" data-fragment-index="1" -->
-- some operations requires direct access  <!-- .element: class="fragment" data-fragment-index="2" -->
+- some operations not possible  <!-- .element: class="fragment" data-fragment-index="2" -->
 
 Note:
 There are also some disadvantages:
@@ -178,7 +181,7 @@ some operations, that rely on having the data in memory is not possible: sorting
 <!-- .slide: data-background="./imgs/chuttersnap-1306524-unsplash.jpg" -->
 ### Async iterables
 Note: ES2018 gives us a way to abstract asynchronous sequences too. It is called asyncIterables.
-They can be used for example with files and network resources.
+It can be used for example with files and network resources.
 
 ---
 ```js
@@ -212,9 +215,9 @@ const { value, done } = await asyncIterator.next()
 ```
 Note: The basic building blocks are the iterator/asyncIterator and iterable/asyncIterable interfaces. Let's start with the first.
 
-An iterator is an object that implement a function next. And this function returns an object with this shape:
+An iterator is an object that implements the function "next". And this function returns an object with this shape...
 
-asyncIterators are similar but its next method returns a Promise that once resolved returns the same kind of objects.
+asyncIterators are similar but its next method returns a Promise that once resolved returns the same kind of object.
 
 Both iterator/asyncIterator can implement other optional methods. We will have a look at them later.
 ---
@@ -419,9 +422,18 @@ iter.next().value
 ```
 Note: the generatorObject is an iterable. And we can get to the iterator using Symbol.iterator.
 
-Every time we call "next" on the iterator the generatorFunction is executed and it stops to the yield, returning the value. Then it resumes from the same point.
+Every time we call "next" on the iterator, a fragment of the generatorFunction is executed, and it stops on the yield, returning the value. Then it resumes from the same point.
 
-"yield *" allows to delegate to another iterable.
+"yield *" is a shortcut that allows to delegate to another iterable.
+---
+#### How does this work?
+```js
+function * generatorFunction () {
+  yield 1
+  yield 2
+}
+```
+Note: let's focus on the previous example
 ---
 #### generator function anatomy (simplified)
 ```js
@@ -441,9 +453,10 @@ function customGeneratorFunction () {
 }
 ```
 Note:
+In here I reimplemented a generator function.
 Let me show how it works:
 Here's the first surprise! a generator Object is an iterable and an iterator at the same time.
-But there is more behind the scene that you should know
+But there is more behind the scene that you should know.
 ---
 #### set up/tear down
 ```js
@@ -552,7 +565,7 @@ async function * asyncGeneratorFunction () {
 }
 ```
 Note: async generator functions and async generator objects are very similar the the regular ones.
-With the only exception that they work with async iterables. And therefore they returns a promise.
+With the only exception that they work with async iterables. And therefore the "next" method returns a promise.
 ---
 #### yield / yield*
 ```js
@@ -584,8 +597,21 @@ iter.next().then(({ value }) => console.log(value))
 > 4
 
 ```
-Note: yield * in asynchronous generator function has an extra useful feature.
-It is able to delegate to both synchronous and asynchronous iterable
+Note: and here's how it works
+---
+#### How does it work?
+```js
+async function * asyncGeneratorFunction () {
+  started = true
+  try {
+    yield 1
+    yield 2
+  } finally {
+    started = false
+  }
+}
+```
+Note: back to this example. Let's see how it works ...
 ---
 ```js
 function asyncGeneratorFunction () {
@@ -671,19 +697,22 @@ function bidi() {
   }
 }
 
-const iterat = bidi()[Symbol.iterator]
+const iterat = bidi()[Symbol.iterator]()
 iterat.next('hello')
 const { value } = iterat.next()
 console.log(value)
 // hello
 
-const iterat = bidi()[Symbol.iterator]
+const iterat = bidi()[Symbol.iterator]()
 iterat.throw(new Error('Oh No!'))
 // Oh No!
 ```
 Note:
 The iterator abstraction can be used to describe a sequence of actions driven by a function acting as a scheduler.
-For this reason there is an extra feature to send data back to the iterator. I won't explain this further.
+For this reason there is an extra feature to send data back to the iterator (ot throw an exception in the generator function).
+
+This constitutes the basic building block for building coroutines, a way to implement cooperative multitasking.
+I won't explain this further.
 ---
 #### Takeaways
 - polymorphism <!-- .element: class="fragment" data-fragment-index="1" -->
@@ -692,8 +721,7 @@ For this reason there is an extra feature to send data back to the iterator. I w
 - asyncIterator/asyncIterable <!-- .element: class="fragment" data-fragment-index="4" --> 
 - generator functions <!-- .element: class="fragment" data-fragment-index="5" --> 
 - async generator functions <!-- .element: class="fragment" data-fragment-index="6" --> 
-- yield * <!-- .element: class="fragment" data-fragment-index="7" --> 
-- bidirectional iterator <!-- .element: class="fragment" data-fragment-index="8" --> 
+- bidirectional iterator <!-- .element: class="fragment" data-fragment-index="7" --> 
 ---
 <!-- .slide: data-background="./imgs/nasa-89125-unsplash.jpg" -->
 #### yield 'world'
@@ -701,13 +729,21 @@ Note:
 Iterables are an underused feature of modern javascript.
 But they are indeed very powerful.
 
-Iterables and asyncIterables allows to break free from memory constraints, and go beyond what is possible to do with Arrays.
+Iterables and asyncIterables allow to break free from memory constraints, and go beyond what is possible to do with Arrays.
 
-They achieve that even improving clarity and intention of your code.
+And they achieve that improving clarity of your code.
 
 They are already deeply integrated in Js and ready to be used.
 
-The space is just a for of .. loop away.
+In the book, human beings with the help of androids conquered space.
+Like the androids in the book, iterables can solve problems that were difficult or impossible to solve before. 
+
+They help us to move forward our fronteer, and enable us to achieve more, easily.
+
+One of the androids, in the movie transposition of the books, says:
+"I've seen things you people wouldn't believe ..." that's express my feeling when I started using iterables and this is why I am presenting this to you.
+
+The future is just a for of .. loop away.
 ---
 #### Thanks
 <!-- .slide: data-background="./imgs/franck-v-795974-unsplash.jpg" -->
